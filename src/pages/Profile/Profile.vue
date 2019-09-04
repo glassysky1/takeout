@@ -2,17 +2,18 @@
   <div class="profile">
     <HeaderTop title="我的"></HeaderTop>
     <section class="profile-number">
-      <router-link tag="a" to="/login" class="profile-link">
+      <router-link tag="a" :to="userInfo._id ?'/userinfo':'/login'" class="profile-link">
         <div class="profile_image">
           <i class="iconfont icon-person"></i>
         </div>
         <div class="user-info">
-          <p class="user-info-top">登录/注册</p>
+          <!-- 如果用手机号登录的话直接隐藏 -->
+          <p class="user-info-top" v-if="!userInfo.phone">{{userInfo.name || '登录/注册'}}</p>
           <p>
             <span class="user-icon">
               <i class="iconfont icon-shouji icon-mobile"></i>
             </span>
-            <span class="icon-mobile-number">暂无绑定手机号</span>
+            <span class="icon-mobile-number">{{userInfo.phone}}暂无绑定手机号</span>
           </p>
         </div>
         <span class="arrow">
@@ -94,6 +95,14 @@
         </div>
       </a>
     </section>
+    <section class="profile_my_order border-1px">
+      <mt-button
+        type="danger"
+        style="width:100%"
+        v-if="userInfo._id"
+        @click.stop.prevent="logout"
+      >退出登录</mt-button>
+    </section>
   </div>
 </template>
 
@@ -101,6 +110,8 @@
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
 import HeaderTop from "../../components/HeaderTop/HeaderTop";
+import { MessageBox,Toast } from "mint-ui";
+import { mapState } from "vuex";
 export default {
   //import引入的组件需要注入到对象中才能使用
   components: {
@@ -111,11 +122,29 @@ export default {
     return {};
   },
   //监听属性 类似于data概念
-  computed: {},
+  computed: {
+    ...mapState(["userInfo"])
+  },
   //监控data中的数据变化
   watch: {},
+  inject:['reload'],
   //方法集合
-  methods: {},
+  methods: {
+    logout() {
+      MessageBox.confirm("确定执行此操作?").then(
+        action => {
+          //请求退出
+          this.$store.dispatch("logout");
+          Toast('退出完成')
+          // this.reload()//不管用不知道为什么
+          this.$router.go(0)
+        },
+        action => {
+          console.log("取消");
+        }
+      );
+    }
+  },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {},
   //生命周期 - 挂载完成（可以访问DOM元素）

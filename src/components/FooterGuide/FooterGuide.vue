@@ -43,8 +43,10 @@ export default {
   watch: {},
   //方法集合
   methods: {
-    goTo(path){
-      this.$router.replace(path)
+    goTo(path) {
+      this.$router.replace(path).catch(err => {
+        
+      });
     }
   },
   //生命周期 - 创建完成（可以访问当前this实例）
@@ -83,7 +85,7 @@ export default {
     color #999
     &.on
       color #02a770
-    span 
+    span
       font-size 12px
       margin-top 2px
       margin-bottom 2px
